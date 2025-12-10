@@ -66,7 +66,7 @@ if (!empty($_FILES['image']['name'])) {
 
 
 // ==========================
-// SIMPAN ARTIKEL TXT
+// NYIMPAN ARTIKEL TXT
 // ==========================
 $articleDir = "data/articles/";
 if (!is_dir($articleDir)) mkdir($articleDir, 0777, true);

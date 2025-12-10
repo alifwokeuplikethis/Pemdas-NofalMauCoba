@@ -1,169 +1,128 @@
-<style>
-body {
-    font-family: Arial, sans-serif;
-    max-width: 700px;
-    margin: auto;
-    padding: 20px;
-    line-height: 1.6;
-}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baca Artikel - Blog Sederhana</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
 
-/* Judul */
-h2 {
-    margin-bottom: 5px;
-}
+<div class="container fade-in" style="max-width: 800px; padding-top: 2rem;">
+    
+    <div class="mb-4">
+        <a href="index.php" class="btn btn-outline">⟵ Kembali ke Daftar</a>
+    </div>
 
-/* Info kecil */
-small {
-    color: #555;
-}
+    <?php
+    $id = $_GET['id'];
+    $file = "data/articles/" . $id;
 
-/* Gambar artikel */
-.article-img {
-    max-width: 300px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
+    if (!file_exists($file)) die("<div class='card p-4'>Artikel tidak ditemukan</div>");
 
-/* Area komentar */
-.comment-box {
-    background: #f3f3f3;
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
+    // ====================
+    // BACA ARTIKEL TXT
+    // ====================
+    $fp = fopen($file, "r");
+    $data = [];
 
-/* Form */
-form {
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #fafafa;
-}
-
-input[type="text"],
-textarea {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-
-button {
-    padding: 8px 16px;
-    background: #4CAF50;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #3e8f41;
-}
-
-/* Tombol hapus artikel */
-.delete-btn {
-    display: inline-block;
-    margin-top: 15px;
-    background: #d9534f;
-    color: white;
-    padding: 8px 12px;
-    text-decoration: none;
-    border-radius: 6px;
-}
-
-.delete-btn:hover {
-    background: #c9302c;
-}
-
-/* Kembali */
-.back-link {
-    display: inline-block;
-    margin-top: 15px;
-    text-decoration: none;
-}
-</style>
-
-<?php
-$id = $_GET['id'];
-$file = "data/articles/" . $id;
-
-if (!file_exists($file)) die("Artikel tidak ditemukan");
-
-// ====================
-// BACA ARTIKEL TXT
-// ====================
-$fp = fopen($file, "r");
-$data = [];
-
-while (($line = fgets($fp)) !== false) {
-    if (strpos($line, "CONTENT:") === 0) break;
-    list($key, $val) = explode("=", trim($line), 2);
-    $data[$key] = $val;
-}
-
-// Ambil isi artikel (setelah CONTENT:)
-$content = "";
-while (($line = fgets($fp)) !== false) {
-    $content .= $line;
-}
-fclose($fp);
-
-
-$title = htmlspecialchars($data['TITLE']);
-$category = htmlspecialchars($data['CATEGORY']);
-$content = nl2br(htmlspecialchars($content));
-
-echo "<h2>$title</h2>";
-echo "<small>Kategori: $category</small><br>";
-echo "<small>".$data['CREATED_AT']."</small><br><br>";
-
-if (!empty($data['IMAGE'])) {
-    echo "<img src='data/images/".$data['IMAGE']."' style='max-width:300px;'><br><br>";
-}
-
-echo "<p>$content</p>";
-
-
-// ====================
-// BACA KOMENTAR TXT
-// ====================
-$commentFile = "data/comments/$id";
-
-if (file_exists($commentFile)) {
-    $fp2 = fopen($commentFile, "r");
-
-    while (($line = fgets($fp2)) !== false) {
-        list($n,$m,$t) = explode("|", trim($line), 3);
-
-        echo "<b>".htmlspecialchars($n)."</b>: ".
-             nl2br(htmlspecialchars($m)).
-             " <small>($t)</small><br>";
+    while (($line = fgets($fp)) !== false) {
+        if (strpos($line, "CONTENT:") === 0) break;
+        list($key, $val) = explode("=", trim($line), 2);
+        $data[$key] = $val;
     }
 
-    fclose($fp2);
-}
-?>
+    // Ambil isi artikel (setelah CONTENT:)
+    $content = "";
+    while (($line = fgets($fp)) !== false) {
+        $content .= $line;
+    }
+    fclose($fp);
 
-<form method="POST" action="save_comment.php">
-    <input type="hidden" name="id" value="<?= $id ?>">
-    Nama:<br>
-    <input type="text" name="name"><br>
-    Komentar:<br>
-    <textarea name="message"></textarea><br><br>
-    <button type="submit">Kirim</button>
-    <a href='index.php' 
-style='
-    display:inline-block;
-    padding:8px 14px;
-    background:#2d89ef;
-    color:white;
-    text-decoration:none;
-    border-radius:6px;
-    font-size:14px;
-    margin-bottom:15px;
-'
->⟵ Kembali</a>
-</form>
+
+    $title = htmlspecialchars($data['TITLE']);
+    $category = htmlspecialchars($data['CATEGORY']);
+    $content = nl2br(htmlspecialchars($content));
+    ?>
+
+    <article class="card mb-6">
+        <?php if (!empty($data['IMAGE'])): ?>
+            <img src="data/images/<?= htmlspecialchars($data['IMAGE']) ?>" class="w-full" style="max-height: 400px; object-fit: cover; border-radius: var(--radius); margin-bottom: 2rem;" alt="<?= $title ?>">
+        <?php endif; ?>
+
+        <div class="mb-4">
+            <span class="tag mb-2"><?= $category ?></span>
+            <h1 class="mb-2"><?= $title ?></h1>
+            <div class="text-muted">Ditulis pada: <?= htmlspecialchars($data['CREATED_AT'] ?? '-') ?></div>
+        </div>
+
+        <div style="font-size: 1.1rem; line-height: 1.8; color: #334155;">
+            <?= $content ?>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t" style="border-top: 1px solid var(--color-border);">
+            <a href="delete_article.php?id=<?= $id ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus artikel ini?')">Hapus Artikel</a>
+        </div>
+    </article>
+
+    <section class="card">
+        <h3 class="mb-4">Komentar</h3>
+
+        <div class="mb-6">
+            <?php
+            // ====================
+            // BACA KOMENTAR TXT
+            // ====================
+            $commentFile = "data/comments/$id";
+
+            if (file_exists($commentFile)) {
+                $fp2 = fopen($commentFile, "r");
+                $hasComments = false;
+
+                while (($line = fgets($fp2)) !== false) {
+                    $hasComments = true;
+                    list($n,$m,$t) = explode("|", trim($line), 3);
+                    ?>
+                    <div class="comment-item">
+                        <div class="d-flex justify-between align-center mb-1">
+                            <strong><?= htmlspecialchars($n) ?></strong>
+                            <small class="text-muted"><?= htmlspecialchars($t) ?></small>
+                        </div>
+                        <p><?= nl2br(htmlspecialchars($m)) ?></p>
+                    </div>
+                    <?php
+                }
+                fclose($fp2);
+                
+                if (!$hasComments) echo "<p class='text-muted'>Belum ada komentar.</p>";
+            } else {
+                echo "<p class='text-muted'>Belum ada komentar.</p>";
+            }
+            ?>
+        </div>
+
+        <h4 class="mb-4">Tulis Komentar</h4>
+        <form method="POST" action="save_comment.php">
+            <input type="hidden" name="id" value="<?= $id ?>">
+            
+            <div class="form-group grid-2">
+                <div class="form-group mb-0">
+                    <label>Nama</label>
+                    <input type="text" name="name" required placeholder="Nama Anda">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Komentar</label>
+                <textarea name="message" rows="4" required placeholder="Tulis komentar..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Kirim Komentar</button>
+        </form>
+    </section>
+
+</div>
+
+</body>
+</html>
