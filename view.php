@@ -33,7 +33,7 @@
         $data[$key] = $val;
     }
 
-    // Ambil isi artikel (setelah CONTENT:)
+    // Ambil isi artikel
     $content = "";
     while (($line = fgets($fp)) !== false) {
         $content .= $line;

@@ -20,7 +20,6 @@
 
     <?php
     $dir = "data/articles/";
-    // Ensure directory exists to avoid errors if empty
     if (!is_dir($dir)) mkdir($dir, 0777, true);
     
     $files = array_diff(scandir($dir), ['.','..']);

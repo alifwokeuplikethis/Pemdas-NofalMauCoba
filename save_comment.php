@@ -6,7 +6,7 @@ $message = trim($_POST['message']);
 
 $path = "data/comments/$id";
 
-$fp = fopen($path, "a"); // append
+$fp = fopen($path, "a");
 
 $line = $name . "|" . $message . "|" . date("Y-m-d H:i:s") . "\n";
 
